@@ -26,20 +26,11 @@ const getFile = (inputUrl) => {
 };
 
 const translate = (input) => {
-    let blocks = input.split('\n');
-    let mappedBlocks = blocks.map((block) => {
-        if (block.startsWith('#') || block === '') {
-            return block;
-        } else {
-            return `<p>${block}</p>`;
-        }
-    });
-    let blockString = mappedBlocks.join('\n');
-
-    let lines = blockString.match(/^.*([\n\r]+|$)/gm);
+    let lines = input.match(/^.*([\n\r]+|$)/gm);
     let preOpen = false;
-
-    lines.forEach((line) => {
+    let ulOpen = false;
+    let olOpen = false;
+    let outputLines = lines.map((line) => {
         console.log(`before ${line}`);
         if (line.startsWith('#')) {
             let lineArray = line.split(' ');
@@ -50,9 +41,8 @@ const translate = (input) => {
             let htmlOut = `<${headerTag}>${lineOutput}</${headerTag}>`;
             line = htmlOut;
         }
-        
-        // needs work
-        if (line.startsWith('<p>```')) {
+
+        if (line.startsWith('```')) {
             if (!preOpen) {
                 line = '<pre>';
                 preOpen = true;
@@ -61,7 +51,8 @@ const translate = (input) => {
                 preOpen = false;
             }
         }
-        outputContainer.innerHTML += line;
         console.log(`after ${line}`);
+        return line;
     });
+    outputContainer.innerHTML = outputLines.join('\n');
 };
