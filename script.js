@@ -30,7 +30,7 @@ const translate = (input) => {
     let preOpen = false;
     let ulOpen = false;
     let olOpen = false;
-    let outputLines = lines.map((line) => {
+    let outputLines = lines.map((line, i) => {
         console.log(`before ${line}`);
         if (line.startsWith('#')) {
             let lineArray = line.split(' ');
@@ -51,6 +51,23 @@ const translate = (input) => {
                 preOpen = false;
             }
         }
+
+        if (line.startsWith('*')) {
+            let lineOut = line.split('* ');
+            if (!ulOpen) {
+                line = `<ul><li>${lineOut[1]}</li>`;
+                ulOpen = true;
+            } 
+            else {
+                if (!lines[i+1].startsWith('*')) {
+                    line = `<li>${lineOut[1]}</li></ul>`
+                    ulOpen = false;
+                } else {
+                    line = `<li>${lineOut[1]}</li>`
+                }
+            }
+        }
+
         console.log(`after ${line}`);
         return line;
     });
