@@ -27,11 +27,12 @@ const getFile = (inputUrl) => {
 
 const translate = (input) => {
     let lines = input.match(/^.*([\n\r]+|$)/gm);
+    console.log(lines)
     let preOpen = false;
     let ulOpen = false;
     let olOpen = false;
     let outputLines = lines.map((line, i) => {
-        console.log(`before ${line}`);
+        // console.log(`before ${line}`);
         if (line.startsWith('#')) {
             let lineArray = line.split(' ');
             let hashes = lineArray[0];
@@ -40,7 +41,7 @@ const translate = (input) => {
             let lineOutput = lineArray.join(' ');
             let htmlOut = `<${headerTag}>${lineOutput}</${headerTag}>`;
             line = htmlOut;
-        }
+        } else
 
         if (line.startsWith('```')) {
             if (!preOpen) {
@@ -50,25 +51,45 @@ const translate = (input) => {
                 line = '</pre>';
                 preOpen = false;
             }
-        }
+        } else
 
-        if (line.startsWith('*')) {
+        if (line.startsWith('* ')) {
             let lineOut = line.split('* ');
             if (!ulOpen) {
                 line = `<ul><li>${lineOut[1]}</li>`;
                 ulOpen = true;
             } 
             else {
-                if (!lines[i+1].startsWith('*')) {
+                if (!lines[i+1].startsWith('* ')) {
                     line = `<li>${lineOut[1]}</li></ul>`
                     ulOpen = false;
                 } else {
                     line = `<li>${lineOut[1]}</li>`
                 }
             }
-        }
+        } else
 
-        console.log(`after ${line}`);
+        if (line.match(/^\d\./)) {
+            let lineSplit = line.split(" ");
+            let number = lineSplit[0].slice(0,-1);
+            let lineContent = [...lineSplit];
+            lineContent.shift();
+           
+            if (!olOpen) {
+                line = `<ol><li value="${number}">${lineContent}</li>`;
+                olOpen = true;
+            }
+            else {
+                if (!lines[i+1].match(/^\d./)) {
+                    line = `<li value="${number}">${lineContent}</li></ol>`
+                    olOpen = false;
+                } else {
+                    line = `<li value="${number}">${lineContent}</li>`
+                }
+            }
+        } else {
+            line = `<p>${line}</p>`
+        }
         return line;
     });
     outputContainer.innerHTML = outputLines.join('\n');
