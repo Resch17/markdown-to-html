@@ -27,7 +27,7 @@ const getFile = (inputUrl) => {
 
 const translate = (input) => {
     let lines = input.match(/^.*([\n\r]+|$)/gm);
-    console.log(lines)
+    console.log(lines);
     let preOpen = false;
     let ulOpen = false;
     let olOpen = false;
@@ -41,9 +41,7 @@ const translate = (input) => {
             let lineOutput = lineArray.join(' ');
             let htmlOut = `<${headerTag}>${lineOutput}</${headerTag}>`;
             line = htmlOut;
-        } else
-
-        if (line.startsWith('```')) {
+        } else if (line.startsWith('```')) {
             if (!preOpen) {
                 line = '<pre>';
                 preOpen = true;
@@ -51,46 +49,54 @@ const translate = (input) => {
                 line = '</pre>';
                 preOpen = false;
             }
-        } else
-
-        if (line.startsWith('* ')) {
+        } else if (line.startsWith('* ')) {
             let lineOut = line.split('* ');
             if (!ulOpen) {
                 line = `<ul><li>${lineOut[1]}</li>`;
                 ulOpen = true;
-            } 
-            else {
-                if (!lines[i+1].startsWith('* ')) {
-                    line = `<li>${lineOut[1]}</li></ul>`
+            } else {
+                if (!lines[i + 1].startsWith('* ')) {
+                    line = `<li>${lineOut[1]}</li></ul>`;
                     ulOpen = false;
                 } else {
-                    line = `<li>${lineOut[1]}</li>`
+                    line = `<li>${lineOut[1]}</li>`;
                 }
             }
-        } else
-
-        if (line.match(/^\d\./)) {
-            let lineSplit = line.split(" ");
-            let number = lineSplit[0].slice(0,-1);
+        } else if (line.match(/^\d\./)) {
+            let lineSplit = line.split(' ');
+            let number = lineSplit[0].slice(0, -1);
             let lineContent = [...lineSplit];
             lineContent.shift();
-           
+
             if (!olOpen) {
                 line = `<ol><li value="${number}">${lineContent}</li>`;
                 olOpen = true;
-            }
-            else {
-                if (!lines[i+1].match(/^\d./)) {
-                    line = `<li value="${number}">${lineContent}</li></ol>`
+            } else {
+                if (!lines[i + 1].match(/^\d./)) {
+                    line = `<li value="${number}">${lineContent}</li></ol>`;
                     olOpen = false;
                 } else {
-                    line = `<li value="${number}">${lineContent}</li>`
+                    line = `<li value="${number}">${lineContent}</li>`;
                 }
             }
         } else {
-            line = `<p>${line}</p>`
+            line = `<p>${line}</p>`;
         }
-        return line;
+
+        let boldTest = line.match(/(\*\*)/g);
+
+        if (boldTest) {
+            if (boldTest.length > 1) {
+                let bold1 = line.replace(/(\*\*)/, '<b>');
+                let outputLine = bold1.replace(/(\*\*)/, '</b>');
+                return outputLine;
+            } else {
+                return line;
+            }
+        } else {
+            return line;
+        }
     });
+
     outputContainer.innerHTML = outputLines.join('\n');
 };
